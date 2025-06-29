@@ -1,0 +1,40 @@
+# Development files
+.git/
+.gitignore
+.gitswitch.json
+.gitswitch.json.backup
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentation source
+docs/
+
+# Build and coverage
+coverage/
+.nyc_output/
+
+# Example files
+examples/
+
+# GitHub files
+.github/
+
+# Other
+.npmignore
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

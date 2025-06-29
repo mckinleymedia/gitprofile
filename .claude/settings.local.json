@@ -11,7 +11,13 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(grep:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm test)",
+      "Bash(gh repo view:*)",
+      "Bash(npm view:*)",
+      "Bash(touch:*)",
+      "Bash(npm link:*)",
+      "Bash(git-switch-cli:*)"
     ],
     "deny": []
   }
