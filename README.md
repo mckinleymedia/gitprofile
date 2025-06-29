@@ -1,106 +1,106 @@
-# git-switch-cli
+# gitprofile
 
-A professional Git account switcher with SSH key management for GitHub, GitLab, and Bitbucket.
+A professional Git profile manager with SSH key management for GitHub, GitLab, and Bitbucket.
 
 ## Features
 
-- 🔄 Quick switching between multiple Git accounts
+- 🔄 Quick switching between multiple Git profiles
 - 🔑 Automatic SSH key generation and management
-- 🔒 Secure storage of account configurations
+- 🔒 Secure storage of profile configurations
 - 🎯 Support for GitHub, GitLab, and Bitbucket
-- 📋 Account listing with current status
-- ✏️ Easy account editing and removal
+- 📋 Profile listing with current status
+- ✏️ Easy profile editing and removal
 - 🔍 SSH connection testing
 - 📝 Interactive and command-line modes
 
 ## Installation
 
 ```bash
-npm install -g git-switch-cli
+npm install -g gitprofile
 ```
 
 Or using yarn:
 
 ```bash
-yarn global add git-switch-cli
+yarn global add gitprofile
 ```
 
 ## Usage
 
-### Initialize GitSwitch
+### Initialize GitProfile
 
-Set up your first Git account:
-
-```bash
-git-switch-cli init
-```
-
-### Add a New Account
-
-Add additional Git accounts:
+Set up your first Git profile:
 
 ```bash
-git-switch-cli add
+gitprofile init
 ```
 
-### Switch Accounts
+### Add a New Profile
 
-Switch to a different account:
+Add additional Git profiles:
+
+```bash
+gitprofile add
+```
+
+### Switch Profiles
+
+Switch to a different profile:
 
 ```bash
 # Interactive mode (select from list)
-git-switch-cli switch
+gitprofile switch
 
 # Direct switch
-git-switch-cli switch work
+gitprofile switch work
 
 # Using the short alias
-gitsw switch personal
+gitprofile switch personal
 ```
 
-### List All Accounts
+### List All Profiles
 
-View all configured accounts:
+View all configured profiles:
 
 ```bash
-git-switch-cli list
+gitprofile list
 ```
 
-### Edit an Account
+### Edit an Profile
 
-Modify account details:
+Modify profile details:
 
 ```bash
-git-switch-cli edit <account-name>
+gitprofile edit <profile-name>
 ```
 
-### Remove an Account
+### Remove an Profile
 
-Delete an account configuration:
+Delete an profile configuration:
 
 ```bash
-git-switch-cli remove <account-name>
+gitprofile remove <profile-name>
 ```
 
 ### Generate SSH Key
 
-Create a new SSH key for an account:
+Create a new SSH key for an profile:
 
 ```bash
-git-switch-cli ssh <account-name>
+gitprofile ssh <profile-name>
 ```
 
 ## Command Reference
 
 ```
 Commands:
-  init [options]                Initialize GitSwitch with your first account
-  add [options]                 Add a new Git account
-  switch [account] [options]    Switch to a different Git account
-  list [options]                List all Git accounts
-  edit <account>                Edit an existing account
-  remove <account>              Remove a Git account
-  ssh <account> [options]       Generate new SSH key for an account
+  init [options]                Initialize GitProfile with your first profile
+  add [options]                 Add a new Git profile
+  switch [profile] [options]    Switch to a different Git profile
+  list [options]                List all Git profiles
+  edit <profile>                Edit an existing profile
+  remove <profile>              Remove a Git profile
+  ssh <profile> [options]       Generate new SSH key for an profile
   current                       Show current Git configuration
   help [command]                Display help for command
 
@@ -111,11 +111,11 @@ Options:
 
 ## SSH Key Management
 
-GitSwitch automatically manages SSH keys for your accounts:
+GitProfile automatically manages SSH keys for your profiles:
 
 1. **Key Generation**: Creates Ed25519 SSH keys (most secure and efficient)
 2. **Key Storage**: Saves keys in `~/.ssh/` with proper permissions (600)
-3. **Connection Testing**: Automatically tests SSH connectivity when switching accounts
+3. **Connection Testing**: Automatically tests SSH connectivity when switching profiles
 4. **Service URLs**: Provides direct links to add your public keys to GitHub/GitLab/Bitbucket
 
 ### Adding SSH Keys to Git Services
@@ -124,20 +124,20 @@ After generating an SSH key, add it to your Git service:
 
 - **GitHub**: https://github.com/settings/keys
 - **GitLab**: https://gitlab.com/-/profile/keys
-- **Bitbucket**: https://bitbucket.org/account/settings/ssh-keys/
+- **Bitbucket**: https://bitbucket.org/profile/settings/ssh-keys/
 
 ## Configuration
 
-GitSwitch stores its configuration in `~/.gitswitch.json`. This file contains:
+GitProfile stores its configuration in `~/.gitprofileitch.json`. This file contains:
 
-- Account names and emails
+- Profile names and emails
 - SSH key paths
 - Git service types
-- Account metadata
+- Profile metadata
 
 ### Backup
 
-GitSwitch automatically creates backups before destructive operations.
+GitProfile automatically creates backups before destructive operations.
 
 ## Security
 
@@ -148,30 +148,30 @@ GitSwitch automatically creates backups before destructive operations.
 
 ## Examples
 
-### Setting Up Multiple Work and Personal Accounts
+### Setting Up Multiple Work and Personal Profiles
 
 ```bash
-# Initialize with personal account
-git-switch-cli init
+# Initialize with personal profile
+gitprofile init
 # Enter: personal, John Doe, john@personal.com, GitHub
 
-# Add work account
-git-switch-cli add
+# Add work profile
+gitprofile add
 # Enter: work, John Doe, john@company.com, GitLab
 
-# Switch between accounts
-gitsw switch work
-gitsw switch personal
+# Switch between profiles
+gitprofile switch work
+gitprofile switch personal
 ```
 
 ### Managing SSH Keys
 
 ```bash
-# Generate new SSH key for work account
-git-switch-cli ssh work
+# Generate new SSH key for work profile
+gitprofile ssh work
 
 # The public key will be copied to clipboard
-# Add it to your GitLab account settings
+# Add it to your GitLab profile settings
 ```
 
 ## Troubleshooting
@@ -212,4 +212,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Repository
 
-[https://github.com/mckinleymedia/gitswitch](https://github.com/mckinleymedia/gitswitch)
+[https://github.com/mckinleymedia/gitprofileitch](https://github.com/mckinleymedia/gitprofileitch)
