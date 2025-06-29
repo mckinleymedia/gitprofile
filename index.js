@@ -860,20 +860,6 @@ class GitSwitch {
         return;
     }
 
-    // Ask if user wants to continue
-    const { continue: shouldContinue } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'continue',
-        message: 'Do you want to perform another action?',
-        default: true
-      }
-    ]);
-
-    if (shouldContinue) {
-      console.log(); // Empty line for spacing
-      await this.interactiveMenu();
-    }
   }
 }
 
