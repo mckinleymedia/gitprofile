@@ -396,12 +396,8 @@ class GitSwitch {
         
         if (info.sshKey) {
           const validation = this.ssh.validateKeyPair(info.sshKey);
-          if (validation.valid) {
-            const inAgent = this.ssh.isKeyInAgent(info.sshKey);
-            display.listItem('SSH Status', inAgent ? 'Active in agent' : 'Not in agent', 
-              inAgent ? 'success' : 'warning');
-          } else {
-            display.listItem('SSH Status', validation.error, 'error');
+          if (!validation.valid) {
+            display.listItem('SSH Key Issue', validation.error, 'error');
           }
         }
         
@@ -626,10 +622,7 @@ class GitSwitch {
       display.listItem('Type', account.type);
       
       if (account.sshKey) {
-        const inAgent = this.ssh.isKeyInAgent(account.sshKey);
         display.listItem('SSH Key', account.sshKey);
-        display.listItem('SSH Status', inAgent ? 'Active in agent' : 'Not in agent',
-          inAgent ? 'success' : 'warning');
       }
     } else {
       display.warning('No matching GitSwitch account for current Git configuration');
@@ -768,10 +761,94 @@ class GitSwitch {
         }
         break;
 
+      case 'test':
+        if (!accountName) {
+          // Test all accounts with SSH keys
+          const accounts = this.config.getAccountsDetails();
+          display.header('SSH Connectivity Test');
+          
+          for (const [name, info] of Object.entries(accounts)) {
+            if (info.sshKey) {
+              await this.testSSHConnection(name, info);
+            }
+          }
+        } else {
+          // Test specific account
+          const accountInfo = this.config.getAccount(accountName);
+          if (!accountInfo || !accountInfo.sshKey) {
+            display.error(`No SSH key configured for account '${accountName}'`);
+            return;
+          }
+          
+          display.header(`Testing SSH connection for '${accountName}'`);
+          await this.testSSHConnection(accountName, accountInfo);
+        }
+        break;
+
       default:
         display.error(`Unknown SSH action: ${action}`);
-        display.info('Valid actions: list, add-to-agent, remove-from-agent, validate');
+        display.info('Valid actions: list, add-to-agent, remove-from-agent, validate, test');
     }
+  }
+
+  async testSSHConnection(accountName, accountInfo) {
+    const { execSync } = require('child_process');
+    
+    display.subheader(`Testing ${accountName} (${accountInfo.type})`);
+    
+    // Determine the Git host
+    const gitHost = accountInfo.type === 'GitHub' ? 'github.com' :
+                    accountInfo.type === 'GitLab' ? 'gitlab.com' :
+                    accountInfo.type === 'Bitbucket' ? 'bitbucket.org' : null;
+    
+    if (!gitHost) {
+      display.error(`Unknown service type: ${accountInfo.type}`);
+      return;
+    }
+    
+    try {
+      // Test SSH connection using the specific key
+      const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${accountInfo.sshKey}" git@${gitHost}`;
+      let result = '';
+      
+      try {
+        result = execSync(command, { encoding: 'utf8', stdio: 'pipe' });
+      } catch (error) {
+        // SSH often returns exit code 1 even on success, so we need to check the output
+        result = error.stdout || error.stderr || error.toString();
+      }
+      
+      // Check for successful authentication patterns
+      if (result.includes('successfully authenticated') || 
+          result.includes('Welcome to GitLab') || 
+          result.includes('logged in as')) {
+        display.success(`✓ SSH key works with ${accountInfo.type}`);
+        
+        // Extract username if available
+        const usernameMatch = result.match(/Hi ([^!]+)!/) || // GitHub
+                             result.match(/@([^\s!]+)/) || // GitLab username format
+                             result.match(/logged in as ([^.]+)./); // Bitbucket
+        
+        if (usernameMatch) {
+          display.listItem('Authenticated as', usernameMatch[1], 'success');
+        }
+      } else if (result.includes('Permission denied')) {
+        display.error(`✗ SSH key not authorized on ${accountInfo.type}`);
+        display.info(`Add your public key at: ${this.ssh.getGitServiceUrl(accountInfo.type)}`);
+      } else if (result.includes('Could not resolve hostname')) {
+        display.error(`✗ Cannot connect to ${gitHost}`);
+      } else {
+        // Unknown response
+        display.warning(`Unexpected response from ${accountInfo.type}`);
+        if (result) {
+          display.info(`Response: ${result.trim().substring(0, 100)}...`);
+        }
+      }
+    } catch (error) {
+      display.error(`✗ SSH test failed: ${error.message}`);
+    }
+    
+    console.log(); // Empty line for spacing
   }
 
   async showConfig() {
@@ -879,6 +956,7 @@ class GitSwitch {
             loop: false,
             choices: [
               'List available keys',
+              'Test SSH connections',
               'Add key to SSH agent',
               'Remove key from SSH agent',
               'Validate SSH keys'
@@ -888,6 +966,7 @@ class GitSwitch {
         
         const actionMap = {
           'List available keys': 'list',
+          'Test SSH connections': 'test',
           'Add key to SSH agent': 'add-to-agent',
           'Remove key from SSH agent': 'remove-from-agent',
           'Validate SSH keys': 'validate'
