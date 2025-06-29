@@ -277,6 +277,45 @@ class GitSwitch {
     });
 
     display.success(`Account '${finalAnswers.accountName}' added successfully`);
+    
+    // Test SSH connection if configured
+    if (sshKeyPath && finalAnswers.accountType) {
+      process.stdout.write('\nTesting SSH connection... ');
+      
+      const gitHost = finalAnswers.accountType === 'GitHub' ? 'github.com' :
+                      finalAnswers.accountType === 'GitLab' ? 'gitlab.com' :
+                      finalAnswers.accountType === 'Bitbucket' ? 'bitbucket.org' : null;
+      
+      if (gitHost) {
+        try {
+          const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${sshKeyPath}" git@${gitHost}`;
+          let result = '';
+          
+          try {
+            result = require('child_process').execSync(command, { encoding: 'utf8', stdio: 'pipe' });
+          } catch (error) {
+            result = error.stdout || error.stderr || error.toString();
+          }
+          
+          if (result.includes('successfully authenticated') || 
+              result.includes('Welcome to GitLab') || 
+              result.includes('logged in as')) {
+            console.log(chalk.green('✓'));
+            display.listItem('SSH Connection', 'Confirmed', 'success');
+          } else if (result.includes('Permission denied')) {
+            console.log(chalk.red('✗'));
+            display.listItem('SSH Connection', 'Key not yet authorized', 'warning');
+            display.info(`Remember to add your key at: ${this.ssh.getGitServiceUrl(finalAnswers.accountType)}`);
+          } else {
+            console.log(chalk.yellow('?'));
+            display.listItem('SSH Connection', 'Unknown status', 'warning');
+          }
+        } catch (error) {
+          console.log(chalk.red('✗'));
+          display.listItem('SSH Connection', 'Test failed', 'error');
+        }
+      }
+    }
   }
 
   async switchAccount(accountName = null, options = {}) {
@@ -323,50 +362,45 @@ class GitSwitch {
     // Update last used
     this.config.updateLastUsed(selectedAccount);
 
-    // Handle SSH key
-    if (accountData.sshKey) {
-      display.listItem('SSH Key', accountData.sshKey);
+    // Test SSH connection if configured
+    if (accountData.sshKey && accountData.type) {
+      process.stdout.write('Testing SSH connection... ');
       
-      if (options.ssh || (!options.quiet && !options.ssh)) {
-        const shouldAddKey = options.ssh || (await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'addToAgent',
-            message: 'Add SSH key to agent?',
-            default: false
+      const gitHost = accountData.type === 'GitHub' ? 'github.com' :
+                      accountData.type === 'GitLab' ? 'gitlab.com' :
+                      accountData.type === 'Bitbucket' ? 'bitbucket.org' : null;
+      
+      if (gitHost) {
+        try {
+          const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${accountData.sshKey}" git@${gitHost}`;
+          let result = '';
+          
+          try {
+            result = require('child_process').execSync(command, { encoding: 'utf8', stdio: 'pipe' });
+          } catch (error) {
+            result = error.stdout || error.stderr || error.toString();
           }
-        ])).addToAgent;
-
-        if (shouldAddKey) {
-          if (!gitUtils.isSSHAgentRunning()) {
-            display.warning('SSH agent is not running');
-            const { startAgent } = await inquirer.prompt([
-              {
-                type: 'confirm',
-                name: 'startAgent',
-                message: 'Start SSH agent?',
-                default: true
-              }
-            ]);
-
-            if (startAgent && gitUtils.startSSHAgent()) {
-              display.success('SSH agent started');
-            }
-          }
-
-          if (!this.ssh.isKeyInAgent(accountData.sshKey)) {
-            try {
-              this.ssh.addToAgent(accountData.sshKey);
-              display.success('SSH key added to agent');
-            } catch (error) {
-              display.error(`Failed to add key to agent: ${error.message}`);
-            }
+          
+          if (result.includes('successfully authenticated') || 
+              result.includes('Welcome to GitLab') || 
+              result.includes('logged in as')) {
+            console.log(chalk.green('✓'));
+            display.listItem('SSH Connection', 'Confirmed', 'success');
+          } else if (result.includes('Permission denied')) {
+            console.log(chalk.red('✗'));
+            display.listItem('SSH Connection', 'Not authorized', 'error');
+            display.info(`Add your key at: ${this.ssh.getGitServiceUrl(accountData.type)}`);
           } else {
-            display.info('SSH key is already in agent');
+            console.log(chalk.yellow('?'));
+            display.listItem('SSH Connection', 'Unknown', 'warning');
           }
+        } catch (error) {
+          console.log(chalk.red('✗'));
+          display.listItem('SSH Connection', 'Failed', 'error');
         }
       }
     }
+
   }
 
   async listAccounts(options = {}) {
