@@ -17,5 +17,8 @@ module.exports = {
       lines: 80,
       statements: 80
     }
+  },
+  moduleNameMapper: {
+    '^clipboardy$': '<rootDir>/tests/__mocks__/clipboardy.js'
   }
 };
