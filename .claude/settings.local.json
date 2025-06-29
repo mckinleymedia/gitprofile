@@ -24,7 +24,8 @@
       "Bash(npm unlink:*)",
       "Bash(gitprofile --version)",
       "Bash(gitprofile list)",
-      "Bash(gitprofile remove test -f)"
+      "Bash(gitprofile remove test -f)",
+      "Bash(npm run test:coverage:*)"
     ],
     "deny": []
   }
