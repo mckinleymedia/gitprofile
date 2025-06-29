@@ -25,7 +25,10 @@
       "Bash(gitprofile --version)",
       "Bash(gitprofile list)",
       "Bash(gitprofile remove test -f)",
-      "Bash(npm run test:coverage:*)"
+      "Bash(npm run test:coverage:*)",
+      "Bash(gitprofile config)",
+      "Bash(gitprofile ssh list)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

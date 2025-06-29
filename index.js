@@ -15,12 +15,12 @@ async function main() {
         break;
 
       case 'add':
-        await gitProfile.addProfile(args[0], options);
+        await gitProfile.addProfile(args.name || args[0], options);
         break;
 
       case 'switch':
       case 'use':
-        await gitProfile.switchProfile(args[0], options);
+        await gitProfile.switchProfile(args.profile || args[0], options);
         break;
 
       case 'list':
@@ -29,21 +29,23 @@ async function main() {
         break;
 
       case 'edit':
-        if (!args[0]) {
+        const editProfile = args.name || args[0];
+        if (!editProfile) {
           display.error('Profile name required');
           process.exit(1);
         }
-        await gitProfile.editProfile(args[0]);
+        await gitProfile.editProfile(editProfile);
         break;
 
       case 'remove':
       case 'rm':
       case 'delete':
-        if (!args[0]) {
+        const removeProfile = args.name || args[0];
+        if (!removeProfile) {
           display.error('Profile name required');
           process.exit(1);
         }
-        await gitProfile.removeProfile(args[0], options);
+        await gitProfile.removeProfile(removeProfile, options);
         break;
 
       case 'current':
@@ -51,29 +53,31 @@ async function main() {
         break;
 
       case 'ssh':
-        if (!args[0] || !args[1]) {
-          display.error('Usage: gitprofile ssh <action> <profile>');
+        if (!args.action) {
+          display.error('Usage: gitprofile ssh <action> [profile]');
           process.exit(1);
         }
-        await gitProfile.manageSSH(args[0], args[1]);
+        await gitProfile.manageSSH(args.action, args.profile);
         break;
 
       case 'backup':
-        await gitProfile.backup(args[0]);
+        await gitProfile.backup(args.path || args[0]);
         break;
 
       case 'restore':
-        if (!args[0]) {
+        const restorePath = args.path || args[0];
+        if (!restorePath) {
           display.error('Backup file path required');
           process.exit(1);
         }
-        await gitProfile.restore(args[0], options);
+        await gitProfile.restore(restorePath, options);
         break;
 
       case 'config':
         await gitProfile.showConfig();
         break;
 
+      case 'interactive':
       case null:
         await gitProfile.interactiveMenu();
         break;
