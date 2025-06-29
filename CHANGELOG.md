@@ -2,7 +2,7 @@
 
 All notable changes to GitSwitch will be documented in this file.
 
-## [2.0.0] - 2024-01-20
+## [2.0.0] - 2025-06-09
 
 ### Added
 - Complete code refactoring with modular architecture
