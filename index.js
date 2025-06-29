@@ -493,6 +493,77 @@ class GitSwitch {
       }
     ]);
 
+    // Ask about SSH key
+    let sshKeyPath = account.sshKey || '';
+    const { updateSshKey } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'updateSshKey',
+        message: account.sshKey ? 'Update SSH key?' : 'Add SSH key?',
+        default: !account.sshKey
+      }
+    ]);
+
+    if (updateSshKey) {
+      // List available SSH keys
+      const sshKeys = this.ssh.listAvailableKeys();
+      if (sshKeys.length > 0) {
+        const keyChoices = [
+          ...sshKeys.map(key => ({
+            name: `${key.name} ${key.hasPublicKey ? '' : '(missing public key)'}`,
+            value: key.path
+          })),
+          new inquirer.Separator(),
+          { name: 'Enter path manually', value: 'manual' },
+          { name: 'Skip', value: 'skip' }
+        ];
+
+        const { selectedKey } = await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'selectedKey',
+            message: 'Select SSH key:',
+            loop: false,
+            choices: keyChoices,
+            default: account.sshKey || undefined
+          }
+        ]);
+
+        if (selectedKey === 'manual') {
+          const { manualPath } = await inquirer.prompt([
+            {
+              type: 'input',
+              name: 'manualPath',
+              message: 'Enter SSH key path:',
+              default: account.sshKey
+            }
+          ]);
+          sshKeyPath = manualPath;
+        } else if (selectedKey !== 'skip') {
+          sshKeyPath = selectedKey;
+        }
+      } else {
+        const { manualPath } = await inquirer.prompt([
+          {
+            type: 'input',
+            name: 'manualPath',
+            message: 'Enter SSH key path:',
+            default: account.sshKey
+          }
+        ]);
+        sshKeyPath = manualPath;
+      }
+
+      // Validate the SSH key if provided
+      if (sshKeyPath && sshKeyPath !== 'skip') {
+        const validation = this.ssh.validateKeyPair(sshKeyPath);
+        if (!validation.valid) {
+          display.error(`SSH key validation failed: ${validation.error}`);
+          sshKeyPath = account.sshKey; // Keep the old value
+        }
+      }
+    }
+
     // Handle account rename
     if (answers.newName !== accountName) {
       this.config.renameAccount(accountName, answers.newName);
@@ -508,7 +579,8 @@ class GitSwitch {
     this.config.updateAccount(answers.newName, {
       name: answers.userName,
       email: answers.email,
-      type: answers.type
+      type: answers.type,
+      sshKey: sshKeyPath
     });
 
     display.success(`Account '${answers.newName}' updated successfully`);
