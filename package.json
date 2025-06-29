@@ -1,0 +1,46 @@
+{
+  "name": "gitswitch",
+  "version": "2.0.0",
+  "description": "Professional Git account switcher with SSH key management for GitHub, GitLab, and Bitbucket",
+  "main": "index.js",
+  "bin": {
+    "gitswitch": "./index.js",
+    "gitsw": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "git",
+    "account",
+    "switch",
+    "github",
+    "gitlab",
+    "bitbucket",
+    "ssh",
+    "git-config",
+    "multi-account",
+    "developer-tools",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "clipboardy": "^3.0.0",
+    "commander": "^14.0.0",
+    "inquirer": "^8.2.4"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/gitswitch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/gitswitch/issues"
+  },
+  "homepage": "https://github.com/yourusername/gitswitch#readme"
+}
