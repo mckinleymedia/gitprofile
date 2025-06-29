@@ -9,7 +9,8 @@
       "Bash(gh repo create:*)",
       "Bash(rg:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

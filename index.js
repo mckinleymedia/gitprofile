@@ -59,6 +59,7 @@ class GitSwitch {
         type: 'list',
         name: 'accountType',
         message: 'Select the account type:',
+        loop: false,
         choices: ['GitHub', 'GitLab', 'Bitbucket'],
         default: 'GitHub'
       }
@@ -116,6 +117,7 @@ class GitSwitch {
         type: 'list',
         name: 'accountType',
         message: 'Select the account type:',
+        loop: false,
         choices: ['GitHub', 'GitLab', 'Bitbucket'],
         default: options.type || 'GitHub',
         when: !options.type
@@ -295,6 +297,7 @@ class GitSwitch {
           type: 'list',
           name: 'account',
           message: 'Select an account to switch to:',
+          loop: false,
           choices: accounts.map(acc => ({
             name: acc === currentAccount ? `${acc} ${chalk.green('(current)')}` : acc,
             value: acc
@@ -485,6 +488,7 @@ class GitSwitch {
         type: 'list',
         name: 'type',
         message: 'Account type:',
+        loop: false,
         choices: ['GitHub', 'GitLab', 'Bitbucket'],
         default: account.type || 'GitHub'
       }
@@ -742,6 +746,7 @@ class GitSwitch {
         type: 'list',
         name: 'action',
         message: 'What would you like to do?',
+        loop: false,
         choices: [
           'Switch Account',
           'List Accounts',
@@ -775,6 +780,7 @@ class GitSwitch {
             type: 'list',
             name: 'account',
             message: 'Select account to edit:',
+            loop: false,
             choices: accounts
           }
         ]);
@@ -787,6 +793,7 @@ class GitSwitch {
             type: 'list',
             name: 'acc',
             message: 'Select account to remove:',
+            loop: false,
             choices: accs
           }
         ]);
@@ -798,6 +805,7 @@ class GitSwitch {
             type: 'list',
             name: 'sshAction',
             message: 'SSH Key Management:',
+            loop: false,
             choices: [
               'List available keys',
               'Add key to SSH agent',
@@ -832,6 +840,7 @@ class GitSwitch {
               type: 'list',
               name: 'account',
               message: 'Select account:',
+              loop: false,
               choices: accountsWithKeys
             }
           ]);
