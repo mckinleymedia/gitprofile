@@ -273,7 +273,6 @@ class GitSwitch {
       name: finalAnswers.name,
       email: finalAnswers.email,
       sshKey: sshKeyPath,
-      publicKey: publicKey,
       type: finalAnswers.accountType
     });
 

@@ -252,7 +252,6 @@ GitSwitch stores its configuration in `~/.gitswitch.json`. Each account entry in
       "name": "John Doe",
       "email": "john@company.com",
       "sshKey": "/Users/john/.ssh/id_ed25519_work",
-      "publicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...",
       "type": "GitHub",
       "createdAt": "2025-05-15T10:30:00.000Z",
       "lastUsed": "2025-06-09T14:20:00.000Z"
