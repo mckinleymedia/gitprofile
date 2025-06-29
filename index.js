@@ -16,7 +16,7 @@ class GitSwitch {
   async init(options = {}) {
     display.header('Initializing GitSwitch');
 
-    if (this.config.hasAccounts() && !options.force) {
+    if (this.config.hasProfiles() && !options.force) {
       const { proceed } = await inquirer.prompt([
         prompts.confirmDestructive('Configuration already exists. Do you want to reinitialize?')
       ]);
@@ -39,16 +39,16 @@ class GitSwitch {
       display.info(`Current Git user: ${currentConfig.name} <${currentConfig.email}>`);
     }
 
-    // Ask for account details
+    // Ask for profile details
     const answers = await inquirer.prompt([
       {
         type: 'input',
-        name: 'accountName',
-        message: 'Enter a name for the current account:',
+        name: 'profileName',
+        message: 'Enter a name for the current profile:',
         default: currentConfig.email || 'default',
         validate: (input) => {
           try {
-            validators.accountName(input);
+            validators.profileName(input);
             return true;
           } catch (error) {
             return error.message;
@@ -57,55 +57,55 @@ class GitSwitch {
       },
       {
         type: 'list',
-        name: 'accountType',
-        message: 'Select the account type:',
+        name: 'profileType',
+        message: 'Select the profile type:',
         loop: false,
         choices: ['GitHub', 'GitLab', 'Bitbucket'],
         default: 'GitHub'
       }
     ]);
 
-    // Save current account
-    this.config.addAccount(answers.accountName, {
+    // Save current profile
+    this.config.addProfile(answers.profileName, {
       name: currentConfig.name,
       email: currentConfig.email,
-      type: answers.accountType
+      type: answers.profileType
     });
 
-    display.success(`Account '${answers.accountName}' saved`);
+    display.success(`Profile '${answers.profileName}' saved`);
 
-    // Ask if user wants to add another account
+    // Ask if user wants to add another profile
     const { addAnother } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'addAnother',
-        message: 'Do you want to add another account?',
+        message: 'Do you want to add another profile?',
         default: false
       }
     ]);
 
     if (addAnother) {
-      await this.addAccount();
+      await this.addProfile();
     }
 
     display.success('GitSwitch initialization complete');
   }
 
-  async addAccount(accountName = null, options = {}) {
-    display.header('Add New Account');
+  async addProfile(profileName = null, options = {}) {
+    display.header('Add New Profile');
 
     const answers = await inquirer.prompt([
       {
         type: 'input',
-        name: 'accountName',
-        message: 'Enter a name for this account:',
-        default: accountName,
-        when: !accountName,
+        name: 'profileName',
+        message: 'Enter a name for this profile:',
+        default: profileName,
+        when: !profileName,
         validate: (input) => {
           try {
-            validators.accountName(input);
-            if (this.config.getAccount(input)) {
-              return `Account '${input}' already exists`;
+            validators.profileName(input);
+            if (this.config.getProfile(input)) {
+              return `Profile '${input}' already exists`;
             }
             return true;
           } catch (error) {
@@ -115,8 +115,8 @@ class GitSwitch {
       },
       {
         type: 'list',
-        name: 'accountType',
-        message: 'Select the account type:',
+        name: 'profileType',
+        message: 'Select the profile type:',
         loop: false,
         choices: ['GitHub', 'GitLab', 'Bitbucket'],
         default: options.type || 'GitHub',
@@ -125,7 +125,7 @@ class GitSwitch {
       {
         type: 'input',
         name: 'name',
-        message: 'Enter the Git user name for this account:',
+        message: 'Enter the Git user name for this profile:',
         default: options.name,
         when: !options.name,
         validate: (input) => {
@@ -140,7 +140,7 @@ class GitSwitch {
       {
         type: 'input',
         name: 'email',
-        message: 'Enter the Git email for this account:',
+        message: 'Enter the Git email for this profile:',
         default: options.email,
         when: !options.email,
         validate: (input) => {
@@ -155,7 +155,7 @@ class GitSwitch {
       {
         type: 'confirm',
         name: 'generateSshKey',
-        message: 'Do you want to generate a new SSH key for this account?',
+        message: 'Do you want to generate a new SSH key for this profile?',
         default: options.generateSsh || false,
         when: !options.sshKey && options.generateSsh === undefined
       }
@@ -163,8 +163,8 @@ class GitSwitch {
 
     // Merge CLI options with interactive answers
     const finalAnswers = {
-      accountName: accountName || answers.accountName,
-      accountType: options.type || answers.accountType,
+      profileName: profileName || answers.profileName,
+      profileType: options.type || answers.profileType,
       name: options.name || answers.name,
       email: options.email || answers.email,
       generateSshKey: options.generateSsh || answers.generateSshKey,
@@ -176,7 +176,7 @@ class GitSwitch {
     let publicKey = '';
 
     if (finalAnswers.generateSshKey) {
-      sshKeyPath = this.ssh.generateKeyPath(finalAnswers.accountName);
+      sshKeyPath = this.ssh.generateKeyPath(finalAnswers.profileName);
       
       if (this.ssh.keyExists(sshKeyPath)) {
         const { regenerate } = await inquirer.prompt([
@@ -216,7 +216,7 @@ class GitSwitch {
         display.success('Public key copied to clipboard');
       }
 
-      const setupUrl = this.ssh.getGitServiceUrl(finalAnswers.accountType);
+      const setupUrl = this.ssh.getGitServiceUrl(finalAnswers.profileType);
       display.info(`Add your SSH key at: ${chalk.underline(setupUrl)}`);
       
       // Update SSH config
@@ -225,16 +225,16 @@ class GitSwitch {
           {
             type: 'confirm',
             name: 'updateConfig',
-            message: 'Add this account to SSH config for easier Git operations?',
+            message: 'Add this profile to SSH config for easier Git operations?',
             default: true
           }
         ]);
 
         if (updateConfig) {
           const hostAlias = await this.ssh.updateSSHConfig(
-            finalAnswers.accountName,
+            finalAnswers.profileName,
             sshKeyPath,
-            finalAnswers.accountType
+            finalAnswers.profileType
           );
           display.success(`SSH config updated. Use '${hostAlias}' as the host in Git URLs`);
           display.info(`Example: git clone git@${hostAlias}:username/repo.git`);
@@ -268,23 +268,23 @@ class GitSwitch {
       publicKey = this.ssh.getPublicKey(sshKeyPath);
     }
 
-    // Save account
-    this.config.addAccount(finalAnswers.accountName, {
+    // Save profile
+    this.config.addProfile(finalAnswers.profileName, {
       name: finalAnswers.name,
       email: finalAnswers.email,
       sshKey: sshKeyPath,
-      type: finalAnswers.accountType
+      type: finalAnswers.profileType
     });
 
-    display.success(`Account '${finalAnswers.accountName}' added successfully`);
+    display.success(`Profile '${finalAnswers.profileName}' added successfully`);
     
     // Test SSH connection if configured
-    if (sshKeyPath && finalAnswers.accountType) {
+    if (sshKeyPath && finalAnswers.profileType) {
       process.stdout.write('\nTesting SSH connection... ');
       
-      const gitHost = finalAnswers.accountType === 'GitHub' ? 'github.com' :
-                      finalAnswers.accountType === 'GitLab' ? 'gitlab.com' :
-                      finalAnswers.accountType === 'Bitbucket' ? 'bitbucket.org' : null;
+      const gitHost = finalAnswers.profileType === 'GitHub' ? 'github.com' :
+                      finalAnswers.profileType === 'GitLab' ? 'gitlab.com' :
+                      finalAnswers.profileType === 'Bitbucket' ? 'bitbucket.org' : null;
       
       if (gitHost) {
         try {
@@ -305,7 +305,7 @@ class GitSwitch {
           } else if (result.includes('Permission denied')) {
             console.log(chalk.red('✗'));
             display.listItem('SSH Connection', 'Key not yet authorized', 'warning');
-            display.info(`Remember to add your key at: ${this.ssh.getGitServiceUrl(finalAnswers.accountType)}`);
+            display.info(`Remember to add your key at: ${this.ssh.getGitServiceUrl(finalAnswers.profileType)}`);
           } else {
             console.log(chalk.yellow('?'));
             display.listItem('SSH Connection', 'Unknown status', 'warning');
@@ -318,61 +318,61 @@ class GitSwitch {
     }
   }
 
-  async switchAccount(accountName = null, options = {}) {
-    if (!this.config.hasAccounts()) {
-      display.error('No accounts configured. Run "gitswitch init" first');
+  async switchProfile(profileName = null, options = {}) {
+    if (!this.config.hasProfiles()) {
+      display.error('No profiles configured. Run "gitswitch init" first');
       return;
     }
 
-    let selectedAccount = accountName;
+    let selectedProfile = profileName;
 
-    if (!selectedAccount) {
-      const accounts = this.config.getAllAccounts();
-      const currentAccount = this.config.getCurrentAccount();
+    if (!selectedProfile) {
+      const profiles = this.config.getAllProfiles();
+      const currentProfile = this.config.getCurrentProfile();
 
-      const { account } = await inquirer.prompt([
+      const { profile } = await inquirer.prompt([
         {
           type: 'list',
-          name: 'account',
-          message: 'Select an account to switch to:',
+          name: 'profile',
+          message: 'Select a profile to switch to:',
           loop: false,
-          choices: accounts.map(acc => ({
-            name: acc === currentAccount ? `${acc} ${chalk.green('(current)')}` : acc,
+          choices: profiles.map(acc => ({
+            name: acc === currentProfile ? `${acc} ${chalk.green('(current)')}` : acc,
             value: acc
           }))
         }
       ]);
       
-      selectedAccount = account;
+      selectedProfile = profile;
     }
 
-    const accountData = this.config.getAccount(selectedAccount);
-    if (!accountData) {
-      display.error(`Account '${selectedAccount}' not found`);
+    const profileData = this.config.getProfile(selectedProfile);
+    if (!profileData) {
+      display.error(`Profile '${selectedProfile}' not found`);
       return;
     }
 
     // Switch Git config
-    gitUtils.setGitConfig(accountData.name, accountData.email);
-    display.success(`Switched to account: ${selectedAccount}`);
-    display.listItem('Name', accountData.name);
-    display.listItem('Email', accountData.email);
-    display.listItem('Type', accountData.type);
+    gitUtils.setGitConfig(profileData.name, profileData.email);
+    display.success(`Switched to profile: ${selectedProfile}`);
+    display.listItem('Name', profileData.name);
+    display.listItem('Email', profileData.email);
+    display.listItem('Type', profileData.type);
 
     // Update last used
-    this.config.updateLastUsed(selectedAccount);
+    this.config.updateLastUsed(selectedProfile);
 
     // Test SSH connection if configured
-    if (accountData.sshKey && accountData.type) {
+    if (profileData.sshKey && profileData.type) {
       process.stdout.write('Testing SSH connection... ');
       
-      const gitHost = accountData.type === 'GitHub' ? 'github.com' :
-                      accountData.type === 'GitLab' ? 'gitlab.com' :
-                      accountData.type === 'Bitbucket' ? 'bitbucket.org' : null;
+      const gitHost = profileData.type === 'GitHub' ? 'github.com' :
+                      profileData.type === 'GitLab' ? 'gitlab.com' :
+                      profileData.type === 'Bitbucket' ? 'bitbucket.org' : null;
       
       if (gitHost) {
         try {
-          const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${accountData.sshKey}" git@${gitHost}`;
+          const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${profileData.sshKey}" git@${gitHost}`;
           let result = '';
           
           try {
@@ -389,7 +389,7 @@ class GitSwitch {
           } else if (result.includes('Permission denied')) {
             console.log(chalk.red('✗'));
             display.listItem('SSH Connection', 'Not authorized', 'error');
-            display.info(`Add your key at: ${this.ssh.getGitServiceUrl(accountData.type)}`);
+            display.info(`Add your key at: ${this.ssh.getGitServiceUrl(profileData.type)}`);
           } else {
             console.log(chalk.yellow('?'));
             display.listItem('SSH Connection', 'Unknown', 'warning');
@@ -403,26 +403,26 @@ class GitSwitch {
 
   }
 
-  async listAccounts(options = {}) {
-    if (!this.config.hasAccounts()) {
-      display.error('No accounts configured');
+  async listProfiles(options = {}) {
+    if (!this.config.hasProfiles()) {
+      display.error('No profiles configured');
       return;
     }
 
-    const accounts = this.config.getAccountsDetails();
-    const currentAccount = this.config.getCurrentAccount();
+    const profiles = this.config.getProfilesDetails();
+    const currentProfile = this.config.getCurrentProfile();
 
     if (options.json) {
-      console.log(JSON.stringify(accounts, null, 2));
+      console.log(JSON.stringify(profiles, null, 2));
       return;
     }
 
-    display.header('Configured Accounts');
+    display.header('Configured Profiles');
 
     if (options.verbose) {
-      Object.entries(accounts).forEach(([name, info]) => {
+      Object.entries(profiles).forEach(([name, info]) => {
         display.separator();
-        display.subheader(`Account: ${name}${name === currentAccount ? ' ' + chalk.green('(current)') : ''}`);
+        display.subheader(`Profile: ${name}${name === currentProfile ? ' ' + chalk.green('(current)') : ''}`);
         display.listItem('Name', info.name);
         display.listItem('Email', info.email);
         display.listItem('Type', info.type || 'Unknown');
@@ -443,41 +443,41 @@ class GitSwitch {
         }
       });
     } else {
-      const tableData = Object.entries(accounts).map(([name, info]) => [
-        name + (name === currentAccount ? ' *' : ''),
+      const tableData = Object.entries(profiles).map(([name, info]) => [
+        name + (name === currentProfile ? ' *' : ''),
         info.name,
         info.email,
         info.type || 'Unknown'
       ]);
       
-      display.table(tableData, ['Account', 'Name', 'Email', 'Type']);
+      display.table(tableData, ['Profile', 'Name', 'Email', 'Type']);
       
-      if (currentAccount) {
+      if (currentProfile) {
         console.log(chalk.gray('\n* Currently active'));
       }
     }
   }
 
-  async editAccount(accountName) {
-    const account = this.config.getAccount(accountName);
-    if (!account) {
-      display.error(`Account '${accountName}' not found`);
+  async editProfile(profileName) {
+    const profile = this.config.getProfile(profileName);
+    if (!profile) {
+      display.error(`Profile '${profileName}' not found`);
       return;
     }
 
-    display.header(`Edit Account: ${accountName}`);
+    display.header(`Edit Profile: ${profileName}`);
 
     const answers = await inquirer.prompt([
       {
         type: 'input',
         name: 'newName',
-        message: 'New account name (identifier):',
-        default: accountName,
+        message: 'New profile name (identifier):',
+        default: profileName,
         validate: (input) => {
           try {
-            validators.accountName(input);
-            if (input !== accountName && this.config.getAccount(input)) {
-              return `Account '${input}' already exists`;
+            validators.profileName(input);
+            if (input !== profileName && this.config.getProfile(input)) {
+              return `Profile '${input}' already exists`;
             }
             return true;
           } catch (error) {
@@ -489,7 +489,7 @@ class GitSwitch {
         type: 'input',
         name: 'userName',
         message: 'Git user name:',
-        default: account.name,
+        default: profile.name,
         validate: (input) => {
           try {
             validators.gitUserName(input);
@@ -503,7 +503,7 @@ class GitSwitch {
         type: 'input',
         name: 'email',
         message: 'Git email:',
-        default: account.email,
+        default: profile.email,
         validate: (input) => {
           try {
             validators.email(input);
@@ -516,21 +516,21 @@ class GitSwitch {
       {
         type: 'list',
         name: 'type',
-        message: 'Account type:',
+        message: 'Profile type:',
         loop: false,
         choices: ['GitHub', 'GitLab', 'Bitbucket'],
-        default: account.type || 'GitHub'
+        default: profile.type || 'GitHub'
       }
     ]);
 
     // Ask about SSH key
-    let sshKeyPath = account.sshKey || '';
+    let sshKeyPath = profile.sshKey || '';
     const { updateSshKey } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'updateSshKey',
-        message: account.sshKey ? 'Update SSH key?' : 'Add SSH key?',
-        default: !account.sshKey
+        message: profile.sshKey ? 'Update SSH key?' : 'Add SSH key?',
+        default: !profile.sshKey
       }
     ]);
 
@@ -555,7 +555,7 @@ class GitSwitch {
             message: 'Select SSH key:',
             loop: false,
             choices: keyChoices,
-            default: account.sshKey || undefined
+            default: profile.sshKey || undefined
           }
         ]);
 
@@ -565,7 +565,7 @@ class GitSwitch {
               type: 'input',
               name: 'manualPath',
               message: 'Enter SSH key path:',
-              default: account.sshKey
+              default: profile.sshKey
             }
           ]);
           sshKeyPath = manualPath;
@@ -578,7 +578,7 @@ class GitSwitch {
             type: 'input',
             name: 'manualPath',
             message: 'Enter SSH key path:',
-            default: account.sshKey
+            default: profile.sshKey
           }
         ]);
         sshKeyPath = manualPath;
@@ -589,43 +589,43 @@ class GitSwitch {
         const validation = this.ssh.validateKeyPair(sshKeyPath);
         if (!validation.valid) {
           display.error(`SSH key validation failed: ${validation.error}`);
-          sshKeyPath = account.sshKey; // Keep the old value
+          sshKeyPath = profile.sshKey; // Keep the old value
         }
       }
     }
 
-    // Handle account rename
-    if (answers.newName !== accountName) {
-      this.config.renameAccount(accountName, answers.newName);
+    // Handle profile rename
+    if (answers.newName !== profileName) {
+      this.config.renameProfile(profileName, answers.newName);
       
       // Update SSH config if needed
-      if (account.sshKey) {
-        this.ssh.removeFromSSHConfig(accountName);
-        await this.ssh.updateSSHConfig(answers.newName, account.sshKey, answers.type);
+      if (profile.sshKey) {
+        this.ssh.removeFromSSHConfig(profileName);
+        await this.ssh.updateSSHConfig(answers.newName, profile.sshKey, answers.type);
       }
     }
 
-    // Update account details
-    this.config.updateAccount(answers.newName, {
+    // Update profile details
+    this.config.updateProfile(answers.newName, {
       name: answers.userName,
       email: answers.email,
       type: answers.type,
       sshKey: sshKeyPath
     });
 
-    display.success(`Account '${answers.newName}' updated successfully`);
+    display.success(`Profile '${answers.newName}' updated successfully`);
   }
 
-  async removeAccount(accountName, options = {}) {
-    const account = this.config.getAccount(accountName);
-    if (!account) {
-      display.error(`Account '${accountName}' not found`);
+  async removeProfile(profileName, options = {}) {
+    const profile = this.config.getProfile(profileName);
+    if (!profile) {
+      display.error(`Profile '${profileName}' not found`);
       return;
     }
 
     if (!options.force) {
       const { confirm } = await inquirer.prompt([
-        prompts.confirmDestructive(`Remove account '${accountName}'?`)
+        prompts.confirmDestructive(`Remove profile '${profileName}'?`)
       ]);
       
       if (!confirm) {
@@ -635,31 +635,31 @@ class GitSwitch {
     }
 
     // Remove from SSH config
-    if (account.sshKey) {
-      this.ssh.removeFromSSHConfig(accountName);
+    if (profile.sshKey) {
+      this.ssh.removeFromSSHConfig(profileName);
     }
 
-    // Remove account
-    this.config.deleteAccount(accountName);
-    display.success(`Account '${accountName}' removed`);
+    // Remove profile
+    this.config.deleteProfile(profileName);
+    display.success(`Profile '${profileName}' removed`);
   }
 
   async showCurrent() {
-    const current = this.config.getCurrentAccount();
+    const current = this.config.getCurrentProfile();
     const gitConfig = gitUtils.getCurrentGitConfig();
 
     if (current) {
-      const account = this.config.getAccount(current);
-      display.header(`Current Account: ${current}`);
+      const profile = this.config.getProfile(current);
+      display.header(`Current Profile: ${current}`);
       display.listItem('Name', gitConfig.name);
       display.listItem('Email', gitConfig.email);
-      display.listItem('Type', account.type);
+      display.listItem('Type', profile.type);
       
-      if (account.sshKey) {
-        display.listItem('SSH Key', account.sshKey);
+      if (profile.sshKey) {
+        display.listItem('SSH Key', profile.sshKey);
       }
     } else {
-      display.warning('No matching GitSwitch account for current Git configuration');
+      display.warning('No matching GitSwitch profile for current Git configuration');
       if (gitConfig.name || gitConfig.email) {
         display.listItem('Git Name', gitConfig.name || 'Not set');
         display.listItem('Git Email', gitConfig.email || 'Not set');
@@ -689,7 +689,7 @@ class GitSwitch {
       return;
     }
 
-    if (this.config.hasAccounts() && !options.force) {
+    if (this.config.hasProfiles() && !options.force) {
       const { confirm } = await inquirer.prompt([
         prompts.confirmDestructive('This will replace your current configuration. Continue?')
       ]);
@@ -708,7 +708,7 @@ class GitSwitch {
     }
   }
 
-  async manageSSH(action, accountName) {
+  async manageSSH(action, profileName) {
     switch (action) {
       case 'list':
         const keys = this.ssh.listAvailableKeys();
@@ -724,19 +724,19 @@ class GitSwitch {
         break;
 
       case 'add-to-agent':
-        if (!accountName) {
-          display.error('Account name required');
+        if (!profileName) {
+          display.error('Profile name required');
           return;
         }
         
-        const account = this.config.getAccount(accountName);
-        if (!account || !account.sshKey) {
-          display.error(`No SSH key configured for account '${accountName}'`);
+        const profile = this.config.getProfile(profileName);
+        if (!profile || !profile.sshKey) {
+          display.error(`No SSH key configured for profile '${profileName}'`);
           return;
         }
 
         try {
-          this.ssh.addToAgent(account.sshKey);
+          this.ssh.addToAgent(profile.sshKey);
           display.success('SSH key added to agent');
         } catch (error) {
           display.error(error.message);
@@ -744,14 +744,14 @@ class GitSwitch {
         break;
 
       case 'remove-from-agent':
-        if (!accountName) {
-          display.error('Account name required');
+        if (!profileName) {
+          display.error('Profile name required');
           return;
         }
         
-        const acc = this.config.getAccount(accountName);
+        const acc = this.config.getProfile(profileName);
         if (!acc || !acc.sshKey) {
-          display.error(`No SSH key configured for account '${accountName}'`);
+          display.error(`No SSH key configured for profile '${profileName}'`);
           return;
         }
 
@@ -763,12 +763,12 @@ class GitSwitch {
         break;
 
       case 'validate':
-        if (!accountName) {
-          // Validate all accounts
-          const accounts = this.config.getAccountsDetails();
+        if (!profileName) {
+          // Validate all profiles
+          const profiles = this.config.getProfilesDetails();
           display.header('SSH Key Validation');
           
-          Object.entries(accounts).forEach(([name, info]) => {
+          Object.entries(profiles).forEach(([name, info]) => {
             if (info.sshKey) {
               const validation = this.ssh.validateKeyPair(info.sshKey);
               display.listItem(name, validation.valid ? 'Valid' : validation.error,
@@ -776,16 +776,16 @@ class GitSwitch {
             }
           });
         } else {
-          // Validate specific account
-          const accountInfo = this.config.getAccount(accountName);
-          if (!accountInfo || !accountInfo.sshKey) {
-            display.error(`No SSH key configured for account '${accountName}'`);
+          // Validate specific profile
+          const profileInfo = this.config.getProfile(profileName);
+          if (!profileInfo || !profileInfo.sshKey) {
+            display.error(`No SSH key configured for profile '${profileName}'`);
             return;
           }
 
-          const validation = this.ssh.validateKeyPair(accountInfo.sshKey);
+          const validation = this.ssh.validateKeyPair(profileInfo.sshKey);
           if (validation.valid) {
-            display.success(`SSH key for '${accountName}' is valid`);
+            display.success(`SSH key for '${profileName}' is valid`);
           } else {
             display.error(`SSH key validation failed: ${validation.error}`);
             if (validation.fixable) {
@@ -796,26 +796,26 @@ class GitSwitch {
         break;
 
       case 'test':
-        if (!accountName) {
-          // Test all accounts with SSH keys
-          const accounts = this.config.getAccountsDetails();
+        if (!profileName) {
+          // Test all profiles with SSH keys
+          const profiles = this.config.getProfilesDetails();
           display.header('SSH Connectivity Test');
           
-          for (const [name, info] of Object.entries(accounts)) {
+          for (const [name, info] of Object.entries(profiles)) {
             if (info.sshKey) {
               await this.testSSHConnection(name, info);
             }
           }
         } else {
-          // Test specific account
-          const accountInfo = this.config.getAccount(accountName);
-          if (!accountInfo || !accountInfo.sshKey) {
-            display.error(`No SSH key configured for account '${accountName}'`);
+          // Test specific profile
+          const profileInfo = this.config.getProfile(profileName);
+          if (!profileInfo || !profileInfo.sshKey) {
+            display.error(`No SSH key configured for profile '${profileName}'`);
             return;
           }
           
-          display.header(`Testing SSH connection for '${accountName}'`);
-          await this.testSSHConnection(accountName, accountInfo);
+          display.header(`Testing SSH connection for '${profileName}'`);
+          await this.testSSHConnection(profileName, profileInfo);
         }
         break;
 
@@ -825,24 +825,24 @@ class GitSwitch {
     }
   }
 
-  async testSSHConnection(accountName, accountInfo) {
+  async testSSHConnection(profileName, profileInfo) {
     const { execSync } = require('child_process');
     
-    display.subheader(`Testing ${accountName} (${accountInfo.type})`);
+    display.subheader(`Testing ${profileName} (${profileInfo.type})`);
     
     // Determine the Git host
-    const gitHost = accountInfo.type === 'GitHub' ? 'github.com' :
-                    accountInfo.type === 'GitLab' ? 'gitlab.com' :
-                    accountInfo.type === 'Bitbucket' ? 'bitbucket.org' : null;
+    const gitHost = profileInfo.type === 'GitHub' ? 'github.com' :
+                    profileInfo.type === 'GitLab' ? 'gitlab.com' :
+                    profileInfo.type === 'Bitbucket' ? 'bitbucket.org' : null;
     
     if (!gitHost) {
-      display.error(`Unknown service type: ${accountInfo.type}`);
+      display.error(`Unknown service type: ${profileInfo.type}`);
       return;
     }
     
     try {
       // Test SSH connection using the specific key
-      const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${accountInfo.sshKey}" git@${gitHost}`;
+      const command = `ssh -T -o StrictHostKeyChecking=no -o PasswordAuthentication=no -i "${profileInfo.sshKey}" git@${gitHost}`;
       let result = '';
       
       try {
@@ -856,7 +856,7 @@ class GitSwitch {
       if (result.includes('successfully authenticated') || 
           result.includes('Welcome to GitLab') || 
           result.includes('logged in as')) {
-        display.success(`✓ SSH key works with ${accountInfo.type}`);
+        display.success(`✓ SSH key works with ${profileInfo.type}`);
         
         // Extract username if available
         const usernameMatch = result.match(/Hi ([^!]+)!/) || // GitHub
@@ -867,13 +867,13 @@ class GitSwitch {
           display.listItem('Authenticated as', usernameMatch[1], 'success');
         }
       } else if (result.includes('Permission denied')) {
-        display.error(`✗ SSH key not authorized on ${accountInfo.type}`);
-        display.info(`Add your public key at: ${this.ssh.getGitServiceUrl(accountInfo.type)}`);
+        display.error(`✗ SSH key not authorized on ${profileInfo.type}`);
+        display.info(`Add your public key at: ${this.ssh.getGitServiceUrl(profileInfo.type)}`);
       } else if (result.includes('Could not resolve hostname')) {
         display.error(`✗ Cannot connect to ${gitHost}`);
       } else {
         // Unknown response
-        display.warning(`Unexpected response from ${accountInfo.type}`);
+        display.warning(`Unexpected response from ${profileInfo.type}`);
         if (result) {
           display.info(`Response: ${result.trim().substring(0, 100)}...`);
         }
@@ -888,8 +888,8 @@ class GitSwitch {
   async showConfig() {
     display.header('GitSwitch Configuration');
     display.listItem('Config Path', this.config.configPath);
-    display.listItem('Accounts', Object.keys(this.config.getAccountsDetails()).length);
-    display.listItem('Current Account', this.config.getCurrentAccount() || 'None');
+    display.listItem('Profiles', Object.keys(this.config.getProfilesDetails()).length);
+    display.listItem('Current Profile', this.config.getCurrentProfile() || 'None');
     
     const configSize = require('fs').statSync(this.config.configPath).size;
     display.listItem('Config Size', `${configSize} bytes`);
@@ -898,7 +898,7 @@ class GitSwitch {
 
   async interactiveMenu() {
     // Check for existing config
-    if (!this.config.hasAccounts()) {
+    if (!this.config.hasProfiles()) {
       const { init } = await inquirer.prompt([
         {
           type: 'confirm',
@@ -916,10 +916,10 @@ class GitSwitch {
       }
     }
 
-    // Show current account
-    const current = this.config.getCurrentAccount();
+    // Show current profile
+    const current = this.config.getCurrentProfile();
     if (current) {
-      display.info(`Current account: ${chalk.green(current)}`);
+      display.info(`Current profile: ${chalk.green(current)}`);
     }
 
     // Show menu
@@ -930,15 +930,15 @@ class GitSwitch {
         message: 'What would you like to do?',
         loop: false,
         choices: [
-          'Switch Account',
-          'List Accounts',
-          'Add New Account',
-          'Edit Account',
-          'Remove Account',
+          'Switch Profile',
+          'List Profiles',
+          'Add New Profile',
+          'Edit Profile',
+          'Remove Profile',
           new inquirer.Separator(),
           'Manage SSH Keys',
           'Backup Configuration',
-          'Show Current Account',
+          'Show Current Profile',
           new inquirer.Separator(),
           'Exit'
         ]
@@ -946,40 +946,40 @@ class GitSwitch {
     ]);
 
     switch (action) {
-      case 'Switch Account':
-        await this.switchAccount();
+      case 'Switch Profile':
+        await this.switchProfile();
         break;
-      case 'List Accounts':
-        await this.listAccounts({ verbose: true });
+      case 'List Profiles':
+        await this.listProfiles({ verbose: true });
         break;
-      case 'Add New Account':
-        await this.addAccount();
+      case 'Add New Profile':
+        await this.addProfile();
         break;
-      case 'Edit Account':
-        const accounts = this.config.getAllAccounts();
-        const { account } = await inquirer.prompt([
+      case 'Edit Profile':
+        const profiles = this.config.getAllProfiles();
+        const { profile } = await inquirer.prompt([
           {
             type: 'list',
-            name: 'account',
-            message: 'Select account to edit:',
+            name: 'profile',
+            message: 'Select profile to edit:',
             loop: false,
-            choices: accounts
+            choices: profiles
           }
         ]);
-        await this.editAccount(account);
+        await this.editProfile(profile);
         break;
-      case 'Remove Account':
-        const accs = this.config.getAllAccounts();
+      case 'Remove Profile':
+        const accs = this.config.getAllProfiles();
         const { acc } = await inquirer.prompt([
           {
             type: 'list',
             name: 'acc',
-            message: 'Select account to remove:',
+            message: 'Select profile to remove:',
             loop: false,
             choices: accs
           }
         ]);
-        await this.removeAccount(acc);
+        await this.removeProfile(acc);
         break;
       case 'Manage SSH Keys':
         const { sshAction } = await inquirer.prompt([
@@ -1019,16 +1019,16 @@ class GitSwitch {
             return;
           }
           
-          const { account } = await inquirer.prompt([
+          const { profile } = await inquirer.prompt([
             {
               type: 'list',
-              name: 'account',
+              name: 'profile',
               message: 'Select account:',
               loop: false,
-              choices: accountsWithKeys
+              choices: profilesWithKeys
             }
           ]);
-          selectedAccount = account;
+          selectedProfile = profile;
         }
         
         await this.manageSSH(mappedAction, selectedAccount);
@@ -1036,7 +1036,7 @@ class GitSwitch {
       case 'Backup Configuration':
         await this.backup();
         break;
-      case 'Show Current Account':
+      case 'Show Current Profile':
         await this.showCurrent();
         break;
       case 'Exit':
