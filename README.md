@@ -51,11 +51,13 @@ npm link
 
 ### Interactive Mode
 
-Run `gitswitch` without any arguments to enter interactive mode:
+Simply run `gitswitch` without any arguments to enter interactive mode:
 
 ```bash
 gitswitch
 ```
+
+This will present you with a menu of options to manage your Git accounts.
 
 ### Command Line Interface
 

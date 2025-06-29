@@ -709,36 +709,6 @@ class GitSwitch {
     display.listItem('Config Size', `${configSize} bytes`);
   }
 
-  showQuickHelp() {
-    const currentAccount = this.config.getCurrentAccount();
-    
-    console.log(chalk.bold('\nGitSwitch - Git Account Switcher'));
-    console.log(chalk.gray('Professional Git account management for developers\n'));
-    
-    if (currentAccount) {
-      console.log(chalk.green(`Current account: ${currentAccount}\n`));
-    }
-    
-    console.log(chalk.bold('Common Commands:'));
-    console.log();
-    console.log('  ' + chalk.cyan('gitswitch init') + '              Initialize with current Git config');
-    console.log('  ' + chalk.cyan('gitswitch add <name>') + '        Add a new account');
-    console.log('  ' + chalk.cyan('gitswitch switch [account]') + '  Switch to a different account');
-    console.log('  ' + chalk.cyan('gitswitch list') + '              List all accounts');
-    console.log('  ' + chalk.cyan('gitswitch current') + '           Show current account details');
-    console.log();
-    console.log(chalk.bold('Quick Options:'));
-    console.log();
-    console.log('  ' + chalk.cyan('gitswitch') + ' ' + chalk.yellow('-i') + '               Enter interactive mode');
-    console.log('  ' + chalk.cyan('gitswitch') + ' ' + chalk.yellow('-h') + '               Show full help with all commands');
-    console.log();
-    console.log(chalk.gray('Examples:'));
-    console.log(chalk.gray('  gitswitch add work --email work@company.com --generate-ssh'));
-    console.log(chalk.gray('  gitswitch switch personal'));
-    console.log(chalk.gray('  gitswitch ssh add-to-agent work'));
-    console.log();
-    console.log(chalk.gray('For more information: https://github.com/mckinleymedia/gitswitch'));
-  }
 
   async interactiveMenu() {
     // Check for existing config
@@ -964,10 +934,6 @@ async function main() {
         await gitswitch.showConfig();
         break;
       
-      case 'show-quick-help':
-        gitswitch.showQuickHelp();
-        break;
-        
       case 'help':
         // Show full help from commander
         const { setupCLI } = require('./lib/cli');
