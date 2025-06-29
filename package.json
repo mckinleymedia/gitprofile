@@ -37,10 +37,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/gitswitch.git"
+    "url": "https://github.com/mckinleymedia/gitswitch.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/gitswitch/issues"
+    "url": "https://github.com/mckinleymedia/gitswitch/issues"
   },
-  "homepage": "https://github.com/yourusername/gitswitch#readme"
+  "homepage": "https://github.com/mckinleymedia/gitswitch#readme"
 }

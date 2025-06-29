@@ -24,7 +24,7 @@ npm install -g gitswitch
 ### Local Development
 
 ```bash
-git clone https://github.com/yourusername/gitswitch.git
+git clone https://github.com/mckinleymedia/gitswitch.git
 cd gitswitch
 npm install
 npm link
