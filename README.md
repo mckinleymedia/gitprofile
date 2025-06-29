@@ -128,7 +128,7 @@ After generating an SSH key, add it to your Git service:
 
 ## Configuration
 
-GitProfile stores its configuration in `~/.gitprofileitch.json`. This file contains:
+GitProfile stores its configuration in `~/.gitprofile.json`. This file contains:
 
 - Profile names and emails
 - SSH key paths
@@ -212,4 +212,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Repository
 
-[https://github.com/mckinleymedia/gitprofileitch](https://github.com/mckinleymedia/gitprofileitch)
+[https://github.com/mckinleymedia/gitprofile](https://github.com/mckinleymedia/gitprofile)
