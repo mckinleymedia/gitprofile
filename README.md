@@ -16,13 +16,13 @@ A professional Git profile manager with SSH key management for GitHub, GitLab, a
 ## Installation
 
 ```bash
-npm install -g gitprofile
+npm install -g @mckinleymedia/gitprofile
 ```
 
 Or using yarn:
 
 ```bash
-yarn global add gitprofile
+yarn global add @mckinleymedia/gitprofile
 ```
 
 ## Usage

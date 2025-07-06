@@ -1,5 +1,5 @@
 {
-  "name": "gitprofile",
+  "name": "@mckinleymedia/gitprofile",
   "version": "2.0.0",
   "description": "Professional Git profile manager with SSH key management for GitHub, GitLab, and Bitbucket",
   "main": "index.js",
