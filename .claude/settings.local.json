@@ -28,7 +28,15 @@
       "Bash(npm run test:coverage:*)",
       "Bash(gitprofile config)",
       "Bash(gitprofile ssh list)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm:*)",
+      "Bash(gitprofile current)",
+      "Bash(echo $?)",
+      "Bash(ssh-add:*)",
+      "Bash(gitprofile switch az1)",
+      "Bash(ssh:*)",
+      "Bash(gitprofile switch mckinleymedia)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
