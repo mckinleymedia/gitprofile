@@ -7,7 +7,7 @@ jest.mock('fs');
 
 describe('ConfigManager', () => {
   let configManager;
-  const mockConfigPath = path.join(process.env.HOME || process.env.USERPROFILE, '.gitprofile.json');
+  const mockConfigPath = path.join(process.env.HOME || process.env.USERPROFILE, '.gitswitch.json');
   
   beforeEach(() => {
     // Clear all mocks before each test

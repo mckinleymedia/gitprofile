@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to GitProfile will be documented in this file.
+All notable changes to GitSwitch will be documented in this file.
 
 ## [2.0.0] - 2025-06-09
 

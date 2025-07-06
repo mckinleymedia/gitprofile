@@ -1,8 +1,8 @@
 # Development files
 .git/
 .gitignore
-.gitprofile.json
-.gitprofile.json.backup
+.gitswitch.json
+.gitswitch.json.backup
 
 # IDE files
 .vscode/

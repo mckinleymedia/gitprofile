@@ -42,5 +42,5 @@ tmp/
 *.backup
 *.bak
 
-# gitprofile specific
-.gitprofile.json.backup
+# gitswitch specific
+.gitswitch.json.backup

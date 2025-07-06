@@ -1,31 +1,31 @@
 #!/usr/bin/env node
 
-const GitProfile = require('./lib/gitprofile');
+const GitSwitch = require('./lib/gitswitch');
 const { parseArguments } = require('./lib/cli');
 const { display, errorHandler } = require('./lib/utils');
 
 async function main() {
   try {
     const { command, args, options } = parseArguments();
-    const gitProfile = new GitProfile();
+    const gitSwitch = new GitSwitch();
 
     switch (command) {
       case 'init':
-        await gitProfile.init(options);
+        await gitSwitch.init(options);
         process.exit(0);
 
       case 'add':
-        await gitProfile.addProfile(args.name || args[0], options);
+        await gitSwitch.addProfile(args.name || args[0], options);
         process.exit(0);
 
       case 'switch':
       case 'use':
-        await gitProfile.switchProfile(args.profile || args[0], options);
+        await gitSwitch.switchProfile(args.profile || args[0], options);
         process.exit(0);
 
       case 'list':
       case 'ls':
-        await gitProfile.listProfiles(options);
+        await gitSwitch.listProfiles(options);
         process.exit(0);
 
       case 'edit':
@@ -34,7 +34,7 @@ async function main() {
           display.error('Profile name required');
           process.exit(1);
         }
-        await gitProfile.editProfile(editProfile);
+        await gitSwitch.editProfile(editProfile);
         process.exit(0);
 
       case 'remove':
@@ -45,23 +45,23 @@ async function main() {
           display.error('Profile name required');
           process.exit(1);
         }
-        await gitProfile.removeProfile(removeProfile, options);
+        await gitSwitch.removeProfile(removeProfile, options);
         process.exit(0);
 
       case 'current':
-        await gitProfile.showCurrent();
+        await gitSwitch.showCurrent();
         process.exit(0);
 
       case 'ssh':
         if (!args.action) {
-          display.error('Usage: gitprofile ssh <action> [profile]');
+          display.error('Usage: gitswitch ssh <action> [profile]');
           process.exit(1);
         }
-        await gitProfile.manageSSH(args.action, args.profile);
+        await gitSwitch.manageSSH(args.action, args.profile);
         process.exit(0);
 
       case 'backup':
-        await gitProfile.backup(args.path || args[0]);
+        await gitSwitch.backup(args.path || args[0]);
         process.exit(0);
 
       case 'restore':
@@ -70,16 +70,16 @@ async function main() {
           display.error('Backup file path required');
           process.exit(1);
         }
-        await gitProfile.restore(restorePath, options);
+        await gitSwitch.restore(restorePath, options);
         process.exit(0);
 
       case 'config':
-        await gitProfile.showConfig();
+        await gitSwitch.showConfig();
         process.exit(0);
 
       case 'interactive':
       case null:
-        await gitProfile.interactiveMenu();
+        await gitSwitch.interactiveMenu();
         break;
 
       default:

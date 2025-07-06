@@ -1,4 +1,4 @@
-# gitprofile
+# gitswitch
 
 A professional Git profile manager with SSH key management for GitHub, GitLab, and Bitbucket.
 
@@ -16,23 +16,23 @@ A professional Git profile manager with SSH key management for GitHub, GitLab, a
 ## Installation
 
 ```bash
-npm install -g @mckinleymedia/gitprofile
+npm install -g @mckinleymedia/gitswitch
 ```
 
 Or using yarn:
 
 ```bash
-yarn global add @mckinleymedia/gitprofile
+yarn global add @mckinleymedia/gitswitch
 ```
 
 ## Usage
 
-### Initialize GitProfile
+### Initialize GitSwitch
 
 Set up your first Git profile:
 
 ```bash
-gitprofile init
+gitswitch init
 ```
 
 ### Add a New Profile
@@ -40,7 +40,7 @@ gitprofile init
 Add additional Git profiles:
 
 ```bash
-gitprofile add
+gitswitch add
 ```
 
 ### Switch Profiles
@@ -49,13 +49,13 @@ Switch to a different profile:
 
 ```bash
 # Interactive mode (select from list)
-gitprofile switch
+gitswitch switch
 
 # Direct switch
-gitprofile switch work
+gitswitch switch work
 
 # Using the short alias
-gitprofile switch personal
+gitswitch switch personal
 ```
 
 ### List All Profiles
@@ -63,7 +63,7 @@ gitprofile switch personal
 View all configured profiles:
 
 ```bash
-gitprofile list
+gitswitch list
 ```
 
 ### Edit an Profile
@@ -71,7 +71,7 @@ gitprofile list
 Modify profile details:
 
 ```bash
-gitprofile edit <profile-name>
+gitswitch edit <profile-name>
 ```
 
 ### Remove an Profile
@@ -79,7 +79,7 @@ gitprofile edit <profile-name>
 Delete an profile configuration:
 
 ```bash
-gitprofile remove <profile-name>
+gitswitch remove <profile-name>
 ```
 
 ### Generate SSH Key
@@ -87,14 +87,14 @@ gitprofile remove <profile-name>
 Create a new SSH key for an profile:
 
 ```bash
-gitprofile ssh <profile-name>
+gitswitch ssh <profile-name>
 ```
 
 ## Command Reference
 
 ```
 Commands:
-  init [options]                Initialize GitProfile with your first profile
+  init [options]                Initialize GitSwitch with your first profile
   add [options]                 Add a new Git profile
   switch [profile] [options]    Switch to a different Git profile
   list [options]                List all Git profiles
@@ -111,7 +111,7 @@ Options:
 
 ## SSH Key Management
 
-GitProfile automatically manages SSH keys for your profiles:
+GitSwitch automatically manages SSH keys for your profiles:
 
 1. **Key Generation**: Creates Ed25519 SSH keys (most secure and efficient)
 2. **Key Storage**: Saves keys in `~/.ssh/` with proper permissions (600)
@@ -128,7 +128,7 @@ After generating an SSH key, add it to your Git service:
 
 ## Configuration
 
-GitProfile stores its configuration in `~/.gitprofile.json`. This file contains:
+GitSwitch stores its configuration in `~/.gitswitch.json`. This file contains:
 
 - Profile names and emails
 - SSH key paths
@@ -137,7 +137,7 @@ GitProfile stores its configuration in `~/.gitprofile.json`. This file contains:
 
 ### Backup
 
-GitProfile automatically creates backups before destructive operations.
+GitSwitch automatically creates backups before destructive operations.
 
 ## Security
 
@@ -152,23 +152,23 @@ GitProfile automatically creates backups before destructive operations.
 
 ```bash
 # Initialize with personal profile
-gitprofile init
+gitswitch init
 # Enter: personal, John Doe, john@personal.com, GitHub
 
 # Add work profile
-gitprofile add
+gitswitch add
 # Enter: work, John Doe, john@company.com, GitLab
 
 # Switch between profiles
-gitprofile switch work
-gitprofile switch personal
+gitswitch switch work
+gitswitch switch personal
 ```
 
 ### Managing SSH Keys
 
 ```bash
 # Generate new SSH key for work profile
-gitprofile ssh work
+gitswitch ssh work
 
 # The public key will be copied to clipboard
 # Add it to your GitLab profile settings
@@ -212,4 +212,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Repository
 
-[https://github.com/mckinleymedia/gitprofile](https://github.com/mckinleymedia/gitprofile)
+[https://github.com/mckinleymedia/gitswitch](https://github.com/mckinleymedia/gitswitch)
