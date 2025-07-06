@@ -31,8 +31,7 @@ dist/
 build/
 
 # Test files
-*.test.js
-*.spec.js
+# Note: Test files are tracked in the repository
 
 # Temporary files
 temp/
@@ -43,5 +42,5 @@ tmp/
 *.backup
 *.bak
 
-# GitSwitch specific
-.gitswitch.json.backup
+# gitprofile specific
+.gitprofile.json.backup
