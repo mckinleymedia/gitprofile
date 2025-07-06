@@ -1,6 +1,6 @@
 {
   "name": "@mckinleymedia/gitswitch",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Professional Git profile manager with SSH key management for GitHub, GitLab, and Bitbucket",
   "main": "index.js",
   "bin": {
